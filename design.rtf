@@ -1,0 +1,77 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww22080\viewh14200\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 Parallel Numerical Language\
+\
+Primitive types: \
+	floatX_Y where X specifies significant bits and Y specifies exponent bits\
+	uintX, sintX where X is number of bits you need, can be anything from 1-1000 or some other reasonable limit\
+	bool - the preferred name for a uint1\
+	type type - move types around as values, get basic properties of them\
+	symbol - a symbol is just a name, it has only one value (itself), you can\'92t compute with it. However they can be assigned to type variables and compared for equality with other symbols.\
+\
+Flexible types:\
+	let you specify a list of acceptable types for a computation\
+	compiler chooses best/fastest one\
+	A Flexible type is not equal to the type the compiler chooses to use for it.\
+	However the compiler will make the same choice everywhere for the same flexible type used in different places\
+	Thus flexible types can be compared for equality, they are only equal to the exact same flexible type.\
+	syntax:\
+		float(10-100)_(5-30)  - ranges\
+		float(10-)_(5-)	- minimums\
+		float(10-100)_(y)	- y is a variable\
+		uint(1,2)		- list of options\
+		uint((2*x-1))		- formula on a variable - double paren necessary to distinguish from range\
+		uint(X)|sint(Y) 	- either one of those types\
+		float			- anything floating\
+		uint			- anything integral\
+		num			- this type can be any numeric type\
+\
+Compound types:\
+	struct - very similar to C - except it can have methods defined on them (methods can\'92t modify the struct)\
+	vector - a fixed size N dimensional array - so either a list, matrix, tensor, etc, all elements are the same type\
+		thus a 2x2 array is a different type compared to a 3x3 array\
+	No Pointers - no. just no. they are very incompatible with the idea behind the language\
+	\
+	The following compound types are very unusual for a parallel language and they are potentially inefficient to use.\
+	But the compiler is not there to judge you, it is there to do the best it can\
+\
+	list - a one dimensional array of any size, all objects of the same type\
+	discriminated union - a type that can be any out of a fixed set of types, and stores which one it is as part of the type\
+	set - no duplicates allowed and order makes no difference for equality - converting to a linear type makes the order undefined\
+	map - set of key value pairs - yes, this is weird to implement in parallel and is probably inefficient, \
+\
+Equality-\
+	Two objects are equal if they have the same value. Compound types are equal if every part has the same value.\
+	No reference equality, because there are no references.\
+\
+Functions:\
+	Can\'92t pass objects by reference, only by value.\
+	Therefore cannot modify arguments and have the effect visible on the outside.\
+	All functions are pure mathematical functions. can\'92t modify external environment, can\'92t depend on external environment\
+	The only way to influence outside code is through the return value.\
+	All global \'91variables\'92 are actually constants.\
+	Loop control is flexible - allows most of the constructs from C\'85 for, while, continue, break.\
+	Loops can have an unknown number of iterations at compile time. It might be inefficient to do this however.\
+	Map functions - apply a function to every element of a list/matrix etc return a new element\
+	Reduce functions - turn a linear compound type into a scalar\
+	Filter functions - produce a bool for every element in a list type, indicating whether it should be kept or thrown away\
+	\
+\
+Procedural API:\
+	(still in formation)\
+	Get Binary format - find out how to format data correctly so that parallel land will understand it\
+		Pass it a type (string)\
+		It returns a data structure that tells you how to pack it\
+		Also used to learn how to decode returned data\
+	New buffer - allocate space in parallel land\
+	Write buffer - send data to parallel land\
+	Read buffer - get data back from parallel land\
+	Call function - trigger a parallel function to read from a given buffer, to write to a given buffer, and to call a callback when the operation is finished\
+	`	returns a statement handle\
+		can be used to add another function call to the queue that has to wait for this function to finish before it can execute\
+\
+}
